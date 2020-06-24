@@ -3,7 +3,6 @@ import torch.nn as nn
 from torch.nn import functional as F
 from torchvision import models
 import torch
-import numpy as np
 from models.FCN_32s import FCN_res50 as FCN
 #from models.FCN_16s import FCN_res50 as FCN
 
