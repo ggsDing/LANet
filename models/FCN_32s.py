@@ -1,5 +1,4 @@
 import torch
-import numpy as np
 import torch.nn as nn
 from torchvision import models
 from torch.nn import functional as F
