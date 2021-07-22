@@ -158,4 +158,5 @@ class LANet(nn.Module):
         high = self.classifier1(x2)
         high = F.upsample(high, x_size[2:], mode='bilinear')
                 
-        return high+low #, high , low
+        # high-level and low-level features are auxiliary outputs
+        return high+low, high , low
