@@ -10,6 +10,9 @@ import utils.transform as transform
 from skimage.transform import rescale
 from torchvision.transforms import functional as F
 
+#Please edit this line to your own data directory
+root = 'YOUR_DATA_DIR'
+
 num_classes = 6
 PD_COLORMAP = [[0, 0, 0], [255, 255, 255], [0, 0, 255], [0, 255, 255],
                 [0, 255, 0], [255, 255, 0], [255, 0, 0] ]
@@ -19,9 +22,6 @@ PD_CLASSES  = ['Invalid', 'Impervious surfaces','Building', 'Low vegetation',
 # PD_STD  = np.array([0.14027526, 0.13798502, 0.14333207, 0.14513438])
 PD_MEAN = np.array([85.8, 91.7, 84.9, 96.6, 47])
 PD_STD  = np.array([35.8, 35.2, 36.5, 37, 55])
-
-# CLASS_WEIGHT = [0, 3, 12, 18, 3.3, 4.3]
-root = '/home/dinglei/Code/2ScaleSeg/Data/PD'
 
 def BGRI2RGB(img):
     r = img[0, :, :]
