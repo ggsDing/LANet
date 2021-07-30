@@ -21,8 +21,8 @@ from utils.loss import CrossEntropyLoss2d
 from utils.utils import accuracy, intersectionAndUnion, AverageMeter
 
 args = {
-    'train_batch_size': 2,
-    'val_batch_size': 2,
+    'train_batch_size': 8,
+    'val_batch_size': 8,
     'lr': 0.1,
     'epochs': 50,
     'gpu': True,
@@ -37,7 +37,7 @@ args = {
     'pred_dir': os.path.join(working_path, 'results', DATA_NAME, NET_NAME+'.png'),
     'chkpt_path': os.path.join(working_path, 'checkpoints', DATA_NAME, NET_NAME),
     'log_dir': os.path.join(working_path, 'logs', DATA_NAME, NET_NAME),
-    'load_path': os.path.join(working_path, 'checkpoints', DATA_NAME, 'SCAttNet_28e_OA90.29.pth')
+    'load_path': os.path.join(working_path, 'checkpoints', DATA_NAME, 'xxx.pth')
 }
 
 if not os.path.exists(args['log_dir']): os.makedirs(args['log_dir'])
@@ -46,8 +46,6 @@ writer = SummaryWriter(args['log_dir'])
 def main():        
     net = Net(5, num_classes=RS.num_classes+1).cuda()
     #net.load_state_dict(torch.load(args['load_path']), strict=False)
-    #for param in net.HR.parameters():
-    #    param.requires_grad = False
     
     train_set = RS.RS('train', random_crop=True, crop_nums=args['crop_nums'], random_flip=True, crop_size=args['train_crop_size'], padding=True)
     train_loader = DataLoader(train_set, batch_size=args['train_batch_size'], num_workers=4, shuffle=True)
