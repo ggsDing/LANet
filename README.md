@@ -3,5 +3,6 @@ Pytorch codes for ['LANet: Local Attention Embedding to Improve the Semantic Seg
 
 ![alt text](https://github.com/ggsDing/LANet/blob/master/Overview.png)
 
-If you find this work useful please cite:
+If you find this work useful please cite the following article:
+
 'Ding L, Tang H, Bruzzone L. LANet: Local Attention Embedding to Improve the Semantic Segmentation of Remote Sensing Images[J]. IEEE Transactions on Geoscience and Remote Sensing, 2020.'
