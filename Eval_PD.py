@@ -1,20 +1,18 @@
-import datetime
 import os
-
+import cv2
+import time
 import numpy as np
 import torch.autograd
-from torch.utils.data import DataLoader
-import torch.nn.functional as F
-from scipy import stats
-
-import time
-from datasets import RS_PD_random as RS
 from skimage import io
-import cv2
+import torch.nn.functional as F
+from torch.utils.data import DataLoader
+
 #################################
 from models.LANet import LANet as Net
 NET_NAME = 'LANet'
 DATA_NAME = 'PD'
+from datasets import PD_random as PD
+#################################
 
 from utils.loss import CrossEntropyLoss2d
 from utils.utils import accuracy, intersectionAndUnion, AverageMeter, CaclTP
@@ -25,7 +23,8 @@ args = {
     's_class': 0,
     'val_batch_size': 1,
     'val_crop_size': 1024,
-    'load_path': os.path.join(working_path, 'checkpoints', DATA_NAME, 'xxx.pth')
+    'data_dir': 'YOUR_DATA_DIR',
+    'load_path': os.path.join(working_path, 'checkpoints', DATA_NAME, 'LANet_0e_OA80.21.pth')
 }
 
 def norm_gray(x, out_range=(0, 255)):
@@ -38,17 +37,17 @@ def norm_gray(x, out_range=(0, 255)):
     return y.astype('uint8')    
 
 def main():
-    net = Net(5, num_classes=RS.num_classes+1)    
+    net = Net(5, num_classes=PD.num_classes+1)    
     net.load_state_dict(torch.load(args['load_path']) )#, strict = False
     net = net.cuda()
     net.eval()
     print('Model loaded.')
-    pred_path = os.path.join(RS.root, 'Eval', NET_NAME)
+    pred_path = os.path.join(args['data_dir'], 'Eval', NET_NAME)
     if not os.path.exists(pred_path): os.makedirs(pred_path)
     info_txt_path = os.path.join(pred_path, 'info.txt')
     f = open(info_txt_path, 'w+')
         
-    val_set = RS.RS('val', sliding_crop=True, crop_size=args['val_crop_size'], padding=False) # 
+    val_set = PD.Loader(args['data_dir'], 'val', sliding_crop=True, crop_size=args['val_crop_size'], padding=False) # 
     val_loader = DataLoader(val_set, batch_size=args['val_batch_size'], num_workers=4, shuffle=False)
     predict(net, val_loader, pred_path, args, f)
     f.close()
@@ -67,22 +66,21 @@ def predict(net, pred_loader, pred_path, args, f_out=None):
             if args['gpu']:
                 img = img.cuda().float()
                 label = label.cuda().float()
-
-            output, _, _ = net(img)
+            output, _ = net(img)
             
         output = output.detach().cpu()
-        _, pred = torch.max(output, dim=1)
+        pred = torch.argmax(output, dim=1)
         pred = pred.squeeze(0).numpy()
         
         label = label.detach().cpu().numpy()
         acc, _ = accuracy(pred, label)
         acc_meter.update(acc)
-        pred_color = RS.Index2Color(pred)
+        pred_color = PD.Index2Color(pred)
         img = img.detach().cpu().numpy().squeeze().transpose((1, 2, 0))[:,:,:3]
         img = norm_gray(img)
         pred_name = os.path.join(pred_path, '%d.png'%vi)
         io.imsave(pred_name, pred_color)
-        TP, pred_hist, label_hist, union_hist = CaclTP(pred, label, RS.num_classes)
+        TP, pred_hist, label_hist, union_hist = CaclTP(pred, label, PD.num_classes)
         TP_meter.update(TP)
         pred_meter.update(pred_hist)
         label_meter.update(label_hist)
